@@ -13,7 +13,7 @@ export default function Profile() {
 
     let fileInputRef = useRef(null)
 
-    const {user,setUser} = useContext(UserContext);
+    const {setUser} = useContext(UserContext);
     
     const handleChange = (e) => {
         setUserDetails((prev) => ({
@@ -74,7 +74,7 @@ export default function Profile() {
                     ref={fileInputRef}
                     className='hidden'
                     type="file"
-                    accept="image/*"
+                    accept="image/png, image/jpeg, image/jpg"
                     onChange={handleImageUpload}
                 />
                 <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
