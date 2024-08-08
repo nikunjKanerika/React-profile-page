@@ -76,6 +76,7 @@ export default function Profile() {
                     type="file"
                     accept="image/png, image/jpeg, image/jpg"
                     onChange={handleImageUpload}
+                    required
                 />
                 <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                     <span className="text-white">Change Image</span>
@@ -84,11 +85,12 @@ export default function Profile() {
             <div>Upload only png/jpg format</div>
         </div>
         <div className='flex flex-col  p-4 bg-gray-100 rounded-lg'>
-            <form className='space-y-10'>
+            <form className='space-y-10' onSubmit={(e)=>handleSubmit(e)}>
                 <div className='flex flex-col sm:flex-row mt-4 space-y-4 sm:space-y-0 sm:space-x-20'>
-                    <label htmlFor="">First Name:*</label>
+                    <label htmlFor="first">First Name:*</label>
                     <input 
                         className='p-2 rounded-lg w-full border-2 border-gray-300 focus:outline-none focus:border-none  focus:ring-2 focus:ring-blue-500' 
+                        id='first'
                         name='firstName'
                         onChange={(e)=>handleChange(e)}
                         type="text" 
@@ -119,10 +121,10 @@ export default function Profile() {
                     />
                 </div>
 
-                <Button 
+                <Button
+                    type='submit' 
                     className='w-full md:w-1/6'
                     variant='contained'
-                    onClick={(e)=>handleSubmit(e)}
                 >
                     Save
                 </Button>

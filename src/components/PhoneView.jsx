@@ -20,7 +20,7 @@ const PhoneView = () => {
                     <div className='mt-4 flex flex-col items-center justify-center'>
                         {
                             linkItems?.map(link=>(
-                                <div className=' flex flex-col mb-2 items-center'>
+                                <div key={link.id} className=' flex flex-col mb-2 items-center'>
                                     <Button 
                                         component='a' 
                                         href={link.url} 

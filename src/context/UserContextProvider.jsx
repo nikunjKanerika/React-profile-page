@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useEffect, useState} from "react";
 import profile from '../assets/profile.png'
 import UserContext from "./UserContext";
 

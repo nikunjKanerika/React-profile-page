@@ -4,7 +4,7 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import UserContext from '../context/UserContext';
 export default function AddNewLinks() {
   let [links, setLinks] = useState([]);
-  const {linkItems,saveLinks} = useContext(UserContext);
+  const {saveLinks} = useContext(UserContext);
   const createLink = () =>{
     let linkIndex = 0;
     if(links.length){
@@ -31,7 +31,6 @@ export default function AddNewLinks() {
   }
 
   const handleLinkChange = (index, platform, value) => {
-    // console.log(index,platform,value);
     const updatedLinks = links.map((link, i) =>
         i === index ? { ...link, [platform]: value } : link
     );
@@ -42,7 +41,6 @@ export default function AddNewLinks() {
     e.preventDefault();
     if(links){
         saveLinks(links);
-        console.log(linkItems, 'Lllllllllllllllllllll');
     }else{
       alert('please fill details');
     }
@@ -79,7 +77,7 @@ export default function AddNewLinks() {
                 </Button>
               </div>
               
-              <div className='flex flex-col'>
+              <form className='flex flex-col'>
                 <label className='text-md'>Platform:</label>
                 <select
                   className='p-2 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -104,7 +102,7 @@ export default function AddNewLinks() {
                   required
                    
                 />
-              </div>
+              </form>
           </div>
         ))
       }
