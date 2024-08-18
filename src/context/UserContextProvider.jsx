@@ -10,9 +10,9 @@ const UserContextProvider = ({children}) =>{
         email: 'ben@example.com',
         profileImg: profile
     })
-    const [linkItems, saveLinks] = useState(null)
+    const [linkItems, saveGlobalLinks] = useState(null)
     return(
-        <UserContext.Provider value={{user,setUser,linkItems,saveLinks}}>
+        <UserContext.Provider value={{user,setUser,linkItems,saveGlobalLinks}}>
             {children}
         </UserContext.Provider>
     )

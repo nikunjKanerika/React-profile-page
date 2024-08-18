@@ -1,4 +1,4 @@
-import React,{useRef, useState, useContext} from 'react'
+import React,{useRef, useState, useContext, useEffect} from 'react'
 import { Button } from '@mui/material'
 import profile from '../assets/profile.png'
 import UserContext from '../context/UserContext';
@@ -50,9 +50,33 @@ export default function Profile() {
         }
     }
     
-    const handleSubmit = (e) =>{
+    const handleSubmit = async (e) =>{
         e.preventDefault();
-        setUser(userDetails);  
+
+        setUser(userDetails);   
+        const formData = new FormData(e.target);
+       
+        console.log(e);
+        const file = fileInputRef.current.files[0];
+        if (file) {
+            formData.append('profileImg', file);
+        }
+
+        try {
+            const response = await fetch('/api/v1/saveUser', {
+                method: 'POST',
+                body: formData, // Send FormData as the body
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('User saved successfully', data);
+            } else {
+                console.error('Failed to save user');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
   return (
     <div className='flex flex-col space-y-8 p-4 bg-white-500 shadow-md rounded-lg'>
