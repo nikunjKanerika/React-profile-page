@@ -1,15 +1,16 @@
 import React,{useContext, useState, useEffect} from 'react'
-import UserContext from '../context/UserContext'
 import { Button } from '@mui/material';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 function Preview() {
 
     const [totalUsers, setTotalUsers]  = useState([]);
-
+    
+    console.log(BASE_URL);
     useEffect( ()=>{
 
         async function fetchUsers (){
             try{
-                const response = await fetch(`/api/v1/getUsers`);
+                const response = await fetch(`${BASE_URL}/api/v1/getUsers`);
 
                 if(response.ok){
                     const {users} =  await response.json();

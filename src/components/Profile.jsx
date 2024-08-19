@@ -2,8 +2,10 @@ import React,{useRef, useState, useContext, useEffect} from 'react'
 import { Button } from '@mui/material'
 import profile from '../assets/profile.png'
 import UserContext from '../context/UserContext';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function Profile() {
-    
+
     let [userDetails, setUserDetails] = useState({
         firstName: '',
         lastName: '',
@@ -63,7 +65,7 @@ export default function Profile() {
         }
 
         try {
-            const response = await fetch('/api/v1/saveUser', {
+            const response = await fetch(`${BASE_URL}/api/v1/saveUser`, {
                 method: 'POST',
                 body: formData, // Send FormData as the body
             });

@@ -2,13 +2,13 @@ import React, { useState, useContext, useEffect } from 'react'
 import { Button } from '@mui/material'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import UserContext from '../context/UserContext';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 export default function AddNewLinks() {
 
   const [users, setUsers] = useState([]);
   let [userLinks, setUserLinks] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const {setUser, saveGlobalLinks} = useContext(UserContext);
-
 
   const createLink = () =>{
     let linkIndex = 0;
@@ -52,7 +52,7 @@ export default function AddNewLinks() {
     
     if (firstName) {
       try {
-        const response = await fetch(`/api/v1/getUser/${firstName}`);
+        const response = await fetch(`${BASE_URL}/api/v1/getUser/${firstName}`);
         if (response.ok) {
           const data = await response.json();
           const fetchedUser = {
@@ -76,7 +76,7 @@ export default function AddNewLinks() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const response = await fetch('/api/v1/getUsers');
+        const response = await fetch(`${BASE_URL}/api/v1/getUsers`);
         if (response.ok) {
           const data = await response.json();
           setUsers(data.users); // Adjust based on your API response structure
@@ -109,7 +109,7 @@ export default function AddNewLinks() {
 
 
     try {
-      const response = await fetch(`/api/v1/saveUserLinks`, {
+      const response = await fetch(`${BASE_URL}/api/v1/saveUserLinks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
