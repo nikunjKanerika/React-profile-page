@@ -2,32 +2,52 @@ import React,{useRef, useState, useContext, useEffect} from 'react'
 import { Button } from '@mui/material'
 import profile from '../assets/profile.png'
 import UserContext from '../context/UserContext';
+import { getUser,saveUser } from '../service/api';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function Profile() {
 
-    let [userDetails, setUserDetails] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        profileImg: profile
-    });
+    let [userDetails, setUserDetails] = useState({});
 
     let fileInputRef = useRef(null)
 
-    const {setUser} = useContext(UserContext);
+    const {user,setUser} = useContext(UserContext);
     
+    useEffect(()=>{
+        const fetchUser = async () =>{
+          try {
+                  const response = await getUser();
+                  if (response.ok) {
+                    const data = await response.json();
+                    const user = data.user
+                    const fetchedUser = {
+                      id: user.id,
+                      firstName: user.firstName,
+                      lastName: user.lastName,
+                      email: user.email,
+                      profile_url: user.profile_url
+                    }
+                    setUser(fetchedUser);
+                  } else {
+                    console.error('Failed to fetch user links');
+                  }
+                } catch (error) {
+                  console.error('Error:', error);
+                }
+        }
+        fetchUser();
+      },[])
     const handleChange = (e) => {
         setUserDetails((prev) => ({
             ...prev,
             [e.target.name]: e.target.value
         }));
-        console.log(userDetails)
+       
     };
 
     const handleImageUpload = (e) =>{
         const file = e.target.files[0];
-
+        console.log(file);
         if(file){
 
             const reader = new FileReader();
@@ -35,7 +55,6 @@ export default function Profile() {
 
             reader.onload = function () {
                 const base64dataImg = reader.result; 
-                console.log(base64dataImg);
 
                 setUserDetails(prev => ({
                     ...prev,
@@ -52,6 +71,7 @@ export default function Profile() {
         }
     }
     
+    
     const handleSubmit = async (e) =>{
         e.preventDefault();
 
@@ -64,12 +84,8 @@ export default function Profile() {
             formData.append('profileImg', file);
         }
 
-        try {
-            const response = await fetch(`${BASE_URL}/api/v1/saveUser`, {
-                method: 'POST',
-                body: formData, // Send FormData as the body
-            });
-            
+        try {         
+            const response = await saveUser(formData);   
             if (response.ok) {
                 const data = await response.json();
                 console.log('User saved successfully', data);
@@ -93,7 +109,7 @@ export default function Profile() {
                     name='profileImg'
                     onChange={(e)=>handleChange(e)} 
                     className='rounded-full w-24 h-24' 
-                    src={userDetails.profileImg} 
+                    src={user.profile_url} 
                     alt="profile-pic" 
                 />
                 <input
@@ -119,6 +135,7 @@ export default function Profile() {
                         id='first'
                         name='firstName'
                         onChange={(e)=>handleChange(e)}
+                        value={user.firstName}
                         type="text" 
                         placeholder='Ben' 
                         required 
@@ -131,6 +148,7 @@ export default function Profile() {
                         name='lastName'
                         onChange={handleChange} 
                         type="text"  
+                        value={user.lastName}
                         placeholder='Gupta' 
                         required
                     />
@@ -142,6 +160,7 @@ export default function Profile() {
                         name='email'
                         onChange={handleChange} 
                         type="email" 
+                        value={user.email}
                         placeholder='Ben@example.com' 
                         required 
                     />

@@ -1,6 +1,6 @@
 import React,{useContext} from 'react';
 import { Button } from '@mui/material';
-import profileImg from '../assets/profile.png'
+
 import UserContext from '../context/UserContext';
 const PhoneView = () => {
     const {user,linkItems} = useContext(UserContext);
@@ -10,7 +10,7 @@ const PhoneView = () => {
             <div className='w-72 mt-12 rounded-lg border-2 border-gray-500 space-y-4 flex justify-center p-4'>
                 <div className='w-64 rounded-lg border-2 border-gray-300'>
                     <div className='mt-4 flex items-center justify-center'>
-                        <img className='w-24 h-24 rounded-full' src={user.profileImg} alt="" />
+                        <img className='w-24 h-24 rounded-full' src={user.profile_url} alt="" />
                     </div>
                     <div className=' flex flex-col items-center'> 
                         <h4>{`${user.firstName} ${user.lastName}`}</h4>

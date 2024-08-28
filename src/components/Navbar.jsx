@@ -2,8 +2,16 @@ import React, { useState } from 'react';
 import { Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import LinkIcon from '@mui/icons-material/Link';
+import { useNavigate } from 'react-router-dom';
 import '../index.css'
-export default function Navbar({setShowProfile,setShowPreview}) {
+export default function Navbar({setShowProfile}) {
+
+  const navigate = useNavigate();
+
+  const handlePreviewClick = () => {
+
+    navigate('/preview'); 
+  };
 
   return (
     <div className='flex flex-row justify-between items-center p-4 shadow-md bg-garay-100'>
@@ -14,7 +22,7 @@ export default function Navbar({setShowProfile,setShowPreview}) {
           size='small'
           startIcon={<LinkIcon />}
           style={{ textTransform: 'capitalize' }} 
-          onClick={()=>{setShowProfile(false); setShowPreview(false)}}
+          onClick={()=>{setShowProfile(false);}}
         >
           Links
         </Button>
@@ -24,7 +32,7 @@ export default function Navbar({setShowProfile,setShowPreview}) {
           size='small'
           startIcon={<PersonIcon />}
           style={{ textTransform: 'capitalize' }} 
-          onClick={()=>{setShowProfile(true); setShowPreview(false)}}
+          onClick={()=>{setShowProfile(true)}}
           
         >
           Profile Details
@@ -35,7 +43,7 @@ export default function Navbar({setShowProfile,setShowPreview}) {
           variant='outlined'
           color='primary'
           style={{ textTransform: 'capitalize' }} 
-          onClick={()=>setShowPreview(true)}
+          onClick={handlePreviewClick}
         >
           Preview
         </Button>

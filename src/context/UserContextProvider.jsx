@@ -5,12 +5,9 @@ import UserContext from "./UserContext";
 
 const UserContextProvider = ({children}) =>{
     const [user, setUser] = useState({
-        firstName: 'Ben',
-        lastName: 'Gupta',
-        email: 'ben@example.com',
-        profileImg: profile
     })
-    const [linkItems, saveGlobalLinks] = useState(null)
+    const [linkItems, saveGlobalLinks] = useState([]);
+
     return(
         <UserContext.Provider value={{user,setUser,linkItems,saveGlobalLinks}}>
             {children}

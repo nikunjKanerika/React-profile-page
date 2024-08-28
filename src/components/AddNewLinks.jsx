@@ -1,22 +1,23 @@
 import React, { useState, useContext, useEffect } from 'react'
+import {useNavigate} from 'react-router-dom'
 import { Button } from '@mui/material'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import UserContext from '../context/UserContext';
+import { delLink,getUser,getUsers, saveUserLinks } from '../service/api';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 export default function AddNewLinks() {
 
   const [users, setUsers] = useState([]);
   let [userLinks, setUserLinks] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
+  // const [selectedUser, setSelectedUser] = useState('');
   const {setUser, saveGlobalLinks} = useContext(UserContext);
+  const [linksLength,setLinksLength] = useState(0);
+
+  const navigate = useNavigate()
 
   const createLink = () =>{
-    let linkIndex = 0;
-    if(userLinks.length){
-      linkIndex = userLinks.length;
-    }
-
-    let newLink = { id: linkIndex+1, platform: '', url: '' };
+  
+    let newLink = {  platform: '', url: '' };
     return newLink;
   }
 
@@ -25,17 +26,29 @@ export default function AddNewLinks() {
     setUserLinks([...userLinks,newLink])
   }
 
-  const deleteLink = (i) =>{
-    let newArray = userLinks.filter(linkItem=>{
-      return linkItem.id !== i
+  const deleteLink = async (id) =>{
+    let newArray = userLinks.filter((linkItem)=>{
+      return linkItem.id !== id
     })
-
-    for (let ind = 0; i < newArray.length; i++) {
-      newArray[ind].id = ind + 1;
-      console.log(newArray[ind]);
+   
+    
+    if (id) {
+      try {
+       
+        const response = await delLink(id);
+        
+        if (response.ok) {
+          console.log('Deleted successfully');
+        } else {
+          console.log('No item to delete');
+        }
+      } catch (error) {
+        console.log('Error:', error);
+      }
     }
     
     setUserLinks(newArray);
+    saveGlobalLinks(newArray);
   }
 
   const handleLinkChange = (index, platform, value) => {
@@ -46,40 +59,44 @@ export default function AddNewLinks() {
   };
 
   //handle selected user
-  const handleUserChange = async (e) => {
-    const firstName = e.target.value;
-    setSelectedUser(firstName);
-    
-    if (firstName) {
+  useEffect(()=>{
+    const fetchUser = async () =>{
       try {
-        const response = await fetch(`${BASE_URL}/api/v1/getUser/${firstName}`);
-        if (response.ok) {
-          const data = await response.json();
-          const fetchedUser = {
-            firstName: data.user.firstName,
-            lastName: data.user.lastName,
-            email: data.user.email,
-            profileImg: data.user.profileImg
-          }
-          setUser(fetchedUser);
-          setUserLinks(data.user.links);
-          saveGlobalLinks(data.user.links);
-        } else {
-          console.error('Failed to fetch user links');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
+              const response = await getUser();
+              
+              if (response.ok) {
+                const data = await response.json();
+                const user = data.user
+                console.log(user);
+                const fetchedUser = {
+                  id: user.id,
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  email: user.email,
+                  profile_url: user.profile_url
+                }
+                setUser(fetchedUser);
+                setUserLinks(user.links);
+                setLinksLength(user.links.length);
+                saveGlobalLinks(user.links);
+              } else {
+                console.error('Failed to fetch user links');
+              }
+            } catch (error) {
+              console.error('Error:', error);
+            }
     }
-  };
+    fetchUser();
+  },[])
 
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const response = await fetch(`${BASE_URL}/api/v1/getUsers`);
+        const response = await getUsers();
         if (response.ok) {
-          const data = await response.json();
-          setUsers(data.users); // Adjust based on your API response structure
+          const users = await response.json();
+          console.log(users);
+          setUsers(users); // Adjust based on your API response structure
         } else {
           console.error('Failed to fetch users');
         }
@@ -107,27 +124,24 @@ export default function AddNewLinks() {
       return; 
     }
 
+    if(userLinks.length>linksLength){
+        const newAddedLinks = userLinks.slice(length);
+        console.log(newAddedLinks.length);
 
-    try {
-      const response = await fetch(`${BASE_URL}/api/v1/saveUserLinks`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ firstName: selectedUser, userLinks }), // Send the links data as JSON
-      });
+        const response = await saveUserLinks(newAddedLinks);
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Links saved successfully', data);
-        saveGlobalLinks(userLinks); 
-        setUserLinks(userLinks);
-      } else {
-        console.error('Failed to save links');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Links saved successfully', data);
+          saveGlobalLinks(userLinks); 
+          setUserLinks(userLinks);
+        }else if(response.status===401){
+          navigate('/');
+        } else {
+          console.error('Failed to save links');
+        }
+      
+    }else return null;
   }
   return (
     <div className='flex flex-col space-y-8 p-4 bg-white-500 shadow-md rounded-lg'>
@@ -136,27 +150,13 @@ export default function AddNewLinks() {
         <p className='mt-2'>Add/edit/remove links and then share all your profiles with the world!</p>
       </div>
       <div className='w-full mt-8'>
-        <select
-          className='p-2 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-          value={selectedUser}
-          onChange={handleUserChange}
-        >
-          <option value="">Select a user</option>
-          {users.map(user => (
-            <option key={user.firstName} value={user.firstName}>
-              {user.firstName+' '+user.lastName}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className='w-full mt-8'>
         <Button 
           variant='outlined'
           className='w-full mt-6'
           style={{textTransform: 'capitalize'}}
           onClick={addLink}
           startIcon={<AddOutlinedIcon/>}
-          disabled = { !selectedUser ? true : false}
+          // disabled = { !selectedUser ? true : false}
         >
           Add New Link
         </Button>
@@ -166,7 +166,7 @@ export default function AddNewLinks() {
         userLinks.map((link,index)=>(
           <div key={index} className='bg-gray-100 p-4 rounded-lg'>
               <div className='flex flex-row justify-between'>
-                <div>Link#{link.id}</div>
+                <div>Link#{index+1}</div>
                 <Button 
                   variant='soft'
                   className='text-gray-100' 
@@ -182,7 +182,7 @@ export default function AddNewLinks() {
                 <select
                   className='p-2 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
                   value={link.platform}
-                  onChange={(e)=>handleLinkChange(index, 'platform', e.target.value)}
+                  onChange={(e)=>handleLinkChange( index,'platform', e.target.value)}
                   required
                 >
                   <option value="">Select a option</option>
@@ -197,7 +197,7 @@ export default function AddNewLinks() {
                   className='p-2 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
                   value={link.url}
                   onChange={(e) =>
-                      handleLinkChange(index, 'url', e.target.value)
+                      handleLinkChange( index,'url', e.target.value)
                   }
                   placeholder='ben@example.com'
                   required
@@ -214,7 +214,7 @@ export default function AddNewLinks() {
             onClick={(e)=>handleSubmit(e)}
             className='w-full md:w-1/6' 
             variant='contained'
-            disabled = {!selectedUser ? true : false}
+            // disabled = {!selectedUser ? true : false}
           >
             Save
           </Button>
