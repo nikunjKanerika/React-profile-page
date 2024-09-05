@@ -29,10 +29,10 @@ const App = ()=> {
         <Routes>
           <Route path="/login" element={ <Login  /> } />
           <Route path="/signup" element={ <SignUp /> } />
-           {/* <Route path='/' element={<PrivateRoute setShowProfile={setShowProfile} setShowEditorBar={setShowEditorBar} showEditorBar={showEditorBar}/>}> */}
+  
             <Route path="/" element={<Home />} />
             <Route path="/preview" element={ <Preview />}/>
-           {/* </Route>  */}
+          
         </Routes>
       </BrowserRouter>
       
